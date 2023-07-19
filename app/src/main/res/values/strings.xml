@@ -2,5 +2,10 @@
     <string name="app_name">Notes Recorder2</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="records_create_fragment">Create Note</string>
+    <string name="records_list_fragment">Notes List</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="text_note">Text Note</string>
+    <string name="audio_note">Audio Note</string>
+    <string name="save_note">Save Note</string>
 </resources>
