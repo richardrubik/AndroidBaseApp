@@ -1,12 +1,15 @@
 package com.example.notesrecorder2;
 
+import android.database.Cursor;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +26,15 @@ public class RecordsListFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private DatabaseManager dbManager;
+    private ListView listView;
+    private ListViewAdapter adapter;
+
+    final String[] from = new String[] { DatabaseHelper._ID,
+            DatabaseHelper.TEXT_NOTE, DatabaseHelper.AUDIO_NOTE };
+
+    final int[] to = new int[] { R.id._id, R.id.textnote, R.id.audionote };
 
     public RecordsListFragment() {
         // Required empty public constructor
@@ -60,5 +72,38 @@ public class RecordsListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_records_list, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        dbManager = new DatabaseManager(this.getContext());
+        dbManager.open();
+        Cursor cursor = dbManager.fetch();
+
+        String[] texts = new String[] {null, null, null};
+        String[] audios = new String[] {null, null, null};
+        int i = 0;
+
+        if (cursor.moveToFirst()) {
+            do {
+                String text = cursor.getString(1);
+                texts[i] = text;
+                String audio = cursor.getString(2);
+                audios[i] = audio;
+                i++;
+            } while (cursor.moveToNext());
+        }
+
+        listView = (ListView) getView().findViewById(R.id.list_view);
+        //listView.setEmptyView(getView().findViewById(R.id.empty));
+
+        adapter = new ListViewAdapter(this.getContext(), texts, audios);
+        adapter.notifyDataSetChanged();
+
+        listView.setAdapter(adapter);
+
+        dbManager.close();
     }
 }
