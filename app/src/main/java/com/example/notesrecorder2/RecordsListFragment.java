@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,8 +83,8 @@ public class RecordsListFragment extends Fragment {
         dbManager.open();
         Cursor cursor = dbManager.fetch();
 
-        String[] texts = new String[] {null, null, null};
-        String[] audios = new String[] {null, null, null};
+        String[] texts = new String[10];
+        String[] audios = new String[10];
         int i = 0;
 
         if (cursor.moveToFirst()) {
@@ -93,6 +94,7 @@ public class RecordsListFragment extends Fragment {
                 String audio = cursor.getString(2);
                 audios[i] = audio;
                 i++;
+                Log.i("List", text + ": " + audio);
             } while (cursor.moveToNext());
         }
 

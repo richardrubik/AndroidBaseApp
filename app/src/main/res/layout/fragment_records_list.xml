@@ -3,13 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".RecordsListFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/list_header"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
         android:paddingTop="70dp"
         android:text="@string/records_list_fragment"
         android:textColor="@color/blue_300"
@@ -17,18 +18,19 @@
 
     <ListView
         android:id="@+id/list_view"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:divider="@color/material_blue_grey_800" >
+        android:divider="@color/red_100"
+        android:dividerHeight="1dp"
+        app:layout_constraintTop_toBottomOf="@id/list_header" >
     </ListView>
 
-    <TextView
+    <!--TextView
         android:id="@+id/empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:text="no notes"
-        android:textColor="@color/blue_300" />
-
+        android:textColor="@color/blue_300" /-->
 
 </RelativeLayout>

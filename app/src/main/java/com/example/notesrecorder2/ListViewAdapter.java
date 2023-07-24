@@ -43,7 +43,7 @@ public class ListViewAdapter extends BaseAdapter {
         TextView text_note = (TextView) view.findViewById(R.id.textnote);
         TextView audio_note = (TextView) view.findViewById(R.id.audionote);
         text_note.setText(textNotes[i]);
-        text_note.setText(audioNotes[i]);
+        audio_note.setText(audioNotes[i]);
 
         return view;
     }

@@ -53,6 +53,7 @@ public class RecordsCreateFragment extends Fragment {
     //private String audioFileDir;
     private File audioFile;
     private Uri savedUri;
+    private DatabaseManager dbManager;
 
     public RecordsCreateFragment() {
         // Required empty public constructor
@@ -103,6 +104,9 @@ public class RecordsCreateFragment extends Fragment {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 REQUEST_PERMISSION);
 
+        dbManager = new DatabaseManager(this.getContext());
+        dbManager.open();
+
         editTextInput = getView().findViewById(R.id.text_input);
         buttonSaveNote = getView().findViewById(R.id.button_save_note);
 
@@ -113,6 +117,8 @@ public class RecordsCreateFragment extends Fragment {
                 String note = editTextInput.getText().toString();
                 Log.i("SaveNote", "note: "+ note);
                 //binding.tvNotes.setText(note);  // TODO: save to a SQLite db
+
+                dbManager.insert(note, savedUri.getPath());
             }
         });
 
@@ -146,6 +152,8 @@ public class RecordsCreateFragment extends Fragment {
             mediaPlayer.release();
             mediaPlayer = null;
         }
+
+        dbManager.close();
     }
 
     private boolean checkPermissions() {
