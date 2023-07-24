@@ -4,9 +4,17 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
+import org.sqlite.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+import java.util.stream.Stream;
 
 public class DatabaseManager {
+
+    static {
+        System.loadLibrary("sqliteX");
+    }
+
     private DatabaseHelper dbHelper;
     private Context context;
     private SQLiteDatabase database;
@@ -18,6 +26,14 @@ public class DatabaseManager {
     public DatabaseManager open() throws SQLException {
         dbHelper = new DatabaseHelper(context);
         database = dbHelper.getWritableDatabase();
+
+        String QUERY_VERSION = "SELECT sqlite_version();";
+
+        Cursor c = database.rawQuery(QUERY_VERSION, new String[] {});
+        if (c.moveToFirst()) {
+            Log.v("DATABASE", c.getString(0));
+        }
+
         return this;
     }
 
