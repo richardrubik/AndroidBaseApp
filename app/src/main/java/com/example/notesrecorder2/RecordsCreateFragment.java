@@ -52,9 +52,11 @@ public class RecordsCreateFragment extends Fragment {
     private MediaPlayer mediaPlayer;
     //private String audioFileDir;
     private File audioFile;
+    private Uri savedUri;
 
     public RecordsCreateFragment() {
         // Required empty public constructor
+        savedUri = Uri.EMPTY;
     }
 
     /**
@@ -212,5 +214,12 @@ public class RecordsCreateFragment extends Fragment {
         //sending broadcast message to scan the media file so that it can be available
         //requireContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, newUri));
         Toast.makeText(this.getContext(), "Saved File " + newUri, Toast.LENGTH_LONG).show();
+
+        // remove an existing recording
+        if (savedUri != Uri.EMPTY) {
+            Log.i("SaveMedia", "Overwriting media " + savedUri.getPath());
+            contentResolver.delete(savedUri, null, null);
+        }
+        savedUri = newUri;
     }
 }
