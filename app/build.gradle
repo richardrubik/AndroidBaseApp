@@ -7,11 +7,11 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.notesrecorder2"
+        applicationId 'com.nclman.notesrecorder2'
         minSdk 29
         targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName '1.01'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
