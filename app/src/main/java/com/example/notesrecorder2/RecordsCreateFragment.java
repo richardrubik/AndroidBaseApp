@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -119,6 +120,10 @@ public class RecordsCreateFragment extends Fragment {
 
                 // Save text and audio path to database
                 dbManager.insert(note, savedUri.getPath());
+
+                ListView lv = (ListView) getView().findViewById(R.id.list_view);
+                if (lv != null)
+                    lv.getAdapter().notify();
             }
         });
 

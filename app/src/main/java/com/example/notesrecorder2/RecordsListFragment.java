@@ -19,6 +19,8 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import java.util.LinkedList;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link RecordsListFragment#newInstance} factory method to
@@ -44,7 +46,7 @@ public class RecordsListFragment extends Fragment {
 
     final int[] to = new int[] { R.id._id, R.id.textnote, R.id.audionote };
 
-    public RecordsListFragment() {
+     public RecordsListFragment() {
         // Required empty public constructor
     }
 
@@ -90,21 +92,17 @@ public class RecordsListFragment extends Fragment {
         dbManager.open();
         Cursor cursor = dbManager.fetch();
 
-        String[] ids = new String[10];
-        String[] texts = new String[10];
-        String[] audios = new String[10];
-        int i = 0;
+        LinkedList<RecordsListElement> linked_list = new LinkedList<RecordsListElement>();
 
         if (cursor.moveToFirst()) {
             do {
                 String id = cursor.getString(0);
-                ids[i] = id;
                 String text = cursor.getString(1);
-                texts[i] = text;
                 String audio = cursor.getString(2);
-                audios[i] = audio;
-                i++;
                 Log.i("List", text + ": " + audio);
+
+                RecordsListElement recordListItem = new RecordsListElement(id, text, audio);
+                linked_list.add(recordListItem);
             } while (cursor.moveToNext());
         }
 
@@ -113,7 +111,7 @@ public class RecordsListFragment extends Fragment {
         listView = (ListView) getView().findViewById(R.id.list_view);
         //listView.setEmptyView(getView().findViewById(R.id.empty));
 
-        adapter = new ListViewAdapter(this.getContext(), ids, texts, audios);
+        adapter = new ListViewAdapter(this.getContext(), linked_list);
         adapter.notifyDataSetChanged();
 
         listView.setAdapter(adapter);
@@ -123,8 +121,6 @@ public class RecordsListFragment extends Fragment {
             // One click to perhaps play audio and display full text message in a pop-up
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Object o = listView.getItemAtPosition(position);
-
                 Log.i("OnClick", "position:" + position + " id: " + id);
             }
         });
@@ -144,17 +140,19 @@ public class RecordsListFragment extends Fragment {
                         Log.i("Popup", "item:" + item.getTitle());
 
                         if (item.getTitle() == getResources().getString(R.string.delete_note)) {
-                            dbManager.delete(Integer.parseInt(ids[position]));
+                            RecordsListElement rec = linked_list.get(position);
+
+                            // delete item in database
+                            dbManager.delete(Integer.parseInt(rec._id));
 
                             // delete the media file too
-                            if (audios[position] != null && audios[position].isEmpty() == false) {
+                            if (rec._audio != null && rec._audio.isEmpty() == false) {
                                 ContentResolver cr = requireContext().getContentResolver();
-                                cr.delete(Uri.parse(audios[position]), null, null);
+                                cr.delete(Uri.parse(rec._audio), null, null);
                             }
 
-                            ids[position] = null;
-                            texts[position] = null;
-                            audios[position] = null;
+                            // delete item in linked list
+                            linked_list.remove(position);
 
                             adapter.notifyDataSetChanged();
                         }
@@ -168,14 +166,6 @@ public class RecordsListFragment extends Fragment {
                 return true;
             }
         });
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        //ViewGroup vg = getActivity().findViewById(R.layout.fragment_records_list);
-        //vg.invalidate();
     }
 
     @Override

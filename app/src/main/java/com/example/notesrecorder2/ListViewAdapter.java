@@ -9,29 +9,27 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.util.LinkedList;
+
 public class ListViewAdapter extends BaseAdapter {
     Context context;
-    String idNotes[];
-    String textNotes[];
-    String audioNotes[];
+    LinkedList<RecordsListElement> list;
     LayoutInflater inflter;
 
-    public ListViewAdapter(Context c, String[] idNotes, String[] textNotes, String[] audioNotes) {
+    public ListViewAdapter(Context c, LinkedList<RecordsListElement> linkedList) {
         this.context = c;
-        this.idNotes = idNotes;
-        this.textNotes = textNotes;
-        this.audioNotes = audioNotes;
+        this.list = linkedList;
         inflter = LayoutInflater.from(c);
     }
 
     @Override
     public int getCount() {
-        return textNotes.length;
+        return list.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return null;
+        return (Object)list.get(i);
     }
 
     @Override
@@ -45,9 +43,10 @@ public class ListViewAdapter extends BaseAdapter {
         TextView id_note = (TextView) view.findViewById(R.id._id);
         TextView text_note = (TextView) view.findViewById(R.id.textnote);
         TextView audio_note = (TextView) view.findViewById(R.id.audionote);
-        id_note.setText(idNotes[i]);
-        text_note.setText(textNotes[i]);
-        audio_note.setText(audioNotes[i]);
+        RecordsListElement e = list.get(i);
+        id_note.setText(e._id);
+        text_note.setText(e._txt);
+        audio_note.setText(e._audio);
 
         return view;
     }
