@@ -8,4 +8,6 @@
     <string name="text_note">Text Note</string>
     <string name="audio_note">Audio Note</string>
     <string name="save_note">Save Note</string>
+    <string name="delete_note">Delete Note</string>
+    <string name="edit_note">Edit Note</string>
 </resources>

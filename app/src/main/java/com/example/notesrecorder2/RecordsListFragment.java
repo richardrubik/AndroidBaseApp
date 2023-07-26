@@ -1,6 +1,9 @@
 package com.example.notesrecorder2;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,10 +11,13 @@ import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -102,6 +108,8 @@ public class RecordsListFragment extends Fragment {
             } while (cursor.moveToNext());
         }
 
+        Context c = this.getContext();
+
         listView = (ListView) getView().findViewById(R.id.list_view);
         //listView.setEmptyView(getView().findViewById(R.id.empty));
 
@@ -126,10 +134,48 @@ public class RecordsListFragment extends Fragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("LongClick", "position:" + position + " id: " + id);
-                return false;
+
+                PopupMenu popMenu = new PopupMenu(c, view);
+                popMenu.getMenuInflater().inflate(R.menu.popup_menu, popMenu.getMenu());
+
+                popMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        Log.i("Popup", "item:" + item.getTitle());
+
+                        if (item.getTitle() == getResources().getString(R.string.delete_note)) {
+                            dbManager.delete(Integer.parseInt(ids[position]));
+
+                            // delete the media file too
+                            if (audios[position] != null && audios[position].isEmpty() == false) {
+                                ContentResolver cr = requireContext().getContentResolver();
+                                cr.delete(Uri.parse(audios[position]), null, null);
+                            }
+
+                            ids[position] = null;
+                            texts[position] = null;
+                            audios[position] = null;
+
+                            adapter.notifyDataSetChanged();
+                        }
+
+                        return true;
+                    }
+                });
+
+                popMenu.show();
+
+                return true;
             }
         });
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //ViewGroup vg = getActivity().findViewById(R.layout.fragment_records_list);
+        //vg.invalidate();
     }
 
     @Override
