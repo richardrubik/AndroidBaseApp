@@ -5,10 +5,9 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ViewGroup;
 
 public class MainActivity extends AppCompatActivity {
-    ViewPager2 viewPager;
+    private ViewPager2 viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,4 +30,5 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.i("onBackPressed", "position: " + viewPager.getCurrentItem());
     }
+
 }

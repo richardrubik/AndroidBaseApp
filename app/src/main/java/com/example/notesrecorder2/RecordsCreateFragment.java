@@ -3,6 +3,7 @@ package com.example.notesrecorder2;
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -21,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -56,6 +56,8 @@ public class RecordsCreateFragment extends Fragment {
     private Uri savedUri;
     private DatabaseManager dbManager;
 
+    private ViewPagerAdapter mViewPagerAdapter;
+
     public RecordsCreateFragment() {
         // Required empty public constructor
         savedUri = Uri.EMPTY;
@@ -70,12 +72,13 @@ public class RecordsCreateFragment extends Fragment {
      * @return A new instance of fragment RecordsCreateFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static RecordsCreateFragment newInstance(String param1, String param2) {
+    public static RecordsCreateFragment newInstance(ViewPagerAdapter pagerAdapter, String param1, String param2) {
         RecordsCreateFragment fragment = new RecordsCreateFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
+        fragment.mViewPagerAdapter = pagerAdapter;
         return fragment;
     }
 
@@ -105,12 +108,13 @@ public class RecordsCreateFragment extends Fragment {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 REQUEST_PERMISSION);
 
-        dbManager = new DatabaseManager(this.getContext());
+        dbManager = new DatabaseManager(this.mViewPagerAdapter.getFragmentActivity());
         dbManager.open();
 
         editTextInput = getView().findViewById(R.id.text_input);
         buttonSaveNote = getView().findViewById(R.id.button_save_note);
 
+        final Context context = getContext();
         buttonSaveNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,10 +124,9 @@ public class RecordsCreateFragment extends Fragment {
 
                 // Save text and audio path to database
                 dbManager.insert(note, savedUri.getPath());
+                Toast.makeText(context, "Note Saved", Toast.LENGTH_LONG).show();
 
-                ListView lv = (ListView) getView().findViewById(R.id.list_view);
-                if (lv != null)
-                    lv.getAdapter().notify();
+                mViewPagerAdapter.refreshListFragment();
             }
         });
 
