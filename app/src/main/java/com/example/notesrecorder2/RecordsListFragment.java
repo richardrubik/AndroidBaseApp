@@ -1,8 +1,10 @@
 package com.example.notesrecorder2;
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.LinkedList;
 
 
 /**
@@ -91,7 +95,7 @@ public class RecordsListFragment extends Fragment {
         }
     }
 
-    private boolean hasInitializedAdapter;
+    private boolean hasInitializedAdapter = false;
 
     public void refreshData() {
         DatabaseManager dbMgr = new DatabaseManager(this.mViewPagerAdapter.getFragmentActivity());
@@ -101,18 +105,12 @@ public class RecordsListFragment extends Fragment {
         int numRows = cursor.getCount();
 
         if (numRows > 0) {
-            String[] ids    = new String[numRows];
-            String[] texts  = new String[numRows];
-            String[] audios = new String[numRows];
-
-            int i = 0;
+            LinkedList<RecordsListElement> llist = new LinkedList<RecordsListElement>();
 
             while (cursor.moveToNext()) {
-                ids[i]    = cursor.getString(0);
-                texts[i]  = cursor.getString(1);
-                audios[i] = cursor.getString(2);
-                //Log.i(TAG, texts[i] + ": " + audios[i]);
-                i++;
+                llist.add(new RecordsListElement(cursor.getString(0),
+                        cursor.getString(1),
+                        cursor.getString(2)));
             }
 
             if (getView() == null) {
@@ -122,16 +120,14 @@ public class RecordsListFragment extends Fragment {
 
             ListView listView = (ListView) getView().findViewById(R.id.list_view);
 
-            if (!hasInitializedAdapter) {
+            if (hasInitializedAdapter == false) {
                 ListViewAdapter adapter = new ListViewAdapter(this, this.getContext());
                 listView.setAdapter(adapter);
                 hasInitializedAdapter = true;
             }
 
             ListViewAdapter adapter = (ListViewAdapter)listView.getAdapter();
-            adapter.idNotes    = ids;
-            adapter.textNotes  = texts;
-            adapter.audioNotes = audios;
+            adapter.notesList = llist;
             adapter.notifyDataSetChanged();
         }
 
@@ -139,23 +135,39 @@ public class RecordsListFragment extends Fragment {
         dbMgr.close();
     }
 
-    private void doDeleteNote(long _id) {
+    private void doDeleteNote(int id) {
+        ListView v = (ListView) getView().findViewById(R.id.list_view);
+        ListViewAdapter a = (ListViewAdapter)v.getAdapter();
+        RecordsListElement e = a.notesList.get(id);
+
         DatabaseManager dbMgr = new DatabaseManager(this.mViewPagerAdapter.getFragmentActivity());
         dbMgr.open();
-        dbMgr.delete(_id);
+
+        // delete item in database
+        dbMgr.delete(Integer.parseInt(e.get_id()));
+        // delete audio item
+        if (e.get_audio() != null && e.get_audio().isEmpty() == false) {
+            Log.v("doDeleteNote", e.get_audio());
+            ContentResolver cr = requireContext().getContentResolver();
+            cr.delete(Uri.parse(e.get_audio()), null, null);
+        }
+        // delete item in linked list
+        a.notesList.remove(id);
+
         dbMgr.close();
-        refreshData();
+
+        a.notifyDataSetChanged();
     }
 
-    public void notifyDeleteNote(long _id) {
-        Log.d(TAG, "(notify) Delete: " + _id);
+    public void notifyDeleteNote(int id) {
+        Log.d(TAG, "(notify) Delete: " + id);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
         builder.setTitle("Delete")
                 .setMessage("Do you wish to delete this note?")
                 .setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        doDeleteNote(_id);
+                        doDeleteNote(id);
                         dialog.dismiss();
                     }
                 })

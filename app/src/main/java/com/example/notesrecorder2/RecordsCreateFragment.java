@@ -53,7 +53,7 @@ public class RecordsCreateFragment extends Fragment {
     private MediaPlayer mediaPlayer;
     //private String audioFileDir;
     private File audioFile;
-    private Uri savedUri;
+    private Uri savedUri = Uri.EMPTY;
     private DatabaseManager dbManager;
 
     private ViewPagerAdapter mViewPagerAdapter;
@@ -123,8 +123,11 @@ public class RecordsCreateFragment extends Fragment {
                 Log.i("SaveNote", "note: "+ note);
 
                 // Save text and audio path to database
-                dbManager.insert(note, savedUri.getPath());
+                dbManager.insert(note, savedUri.toString());
                 Toast.makeText(context, "Note Saved", Toast.LENGTH_LONG).show();
+
+                // So that we don't double save (hence double delete)
+                savedUri = Uri.EMPTY;
 
                 mViewPagerAdapter.refreshListFragment();
             }

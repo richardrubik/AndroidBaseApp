@@ -9,12 +9,12 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.LinkedList;
+
 public class ListViewAdapter extends BaseAdapter {
 
     private static final String TAG = "ListViewAdapter";
-    public String[] idNotes;
-    public String[] textNotes;
-    public String[] audioNotes;
+    public LinkedList<RecordsListElement> notesList;
     private final LayoutInflater inflater;
     private final RecordsListFragment mListFragment;
 
@@ -28,16 +28,16 @@ public class ListViewAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if (this.textNotes == null) {
+        if (this.notesList == null) {
             return 0;
         } else {
-            return textNotes.length;
+            return this.notesList.size();
         }
     }
 
     @Override
     public Object getItem(int i) {
-        return null;
+        return (Object) notesList.get(i);
     }
 
     @Override
@@ -51,12 +51,14 @@ public class ListViewAdapter extends BaseAdapter {
         TextView id_note = (TextView) view.findViewById(R.id._id);
         TextView text_note = (TextView) view.findViewById(R.id.textnote);
         TextView audio_note = (TextView) view.findViewById(R.id.audionote);
-        id_note.setText(idNotes[i]);
-        text_note.setText(textNotes[i]);
-        if (audioNotes[i].isEmpty()) {
+
+        RecordsListElement e = notesList.get(i);
+        id_note.setText(e.get_id());
+        text_note.setText(e.get_txt());
+        if (e.get_audio().isEmpty()) {
             audio_note.setText("(no audio note)");
         } else {
-            audio_note.setText(audioNotes[i]);
+            audio_note.setText(e.get_audio());
         }
 
         Button btnDelete = (Button) view.findViewById(R.id.buttonDelete);
@@ -82,15 +84,15 @@ public class ListViewAdapter extends BaseAdapter {
     private void onDeleteClick(View v) {
         int selectedIndex = v.getId() - BUTTON_DELETE_BASE_ID;
         Log.v(TAG, "Selected Index (delete): " + selectedIndex);
-        this.mListFragment.notifyDeleteNote(Long.parseLong(this.idNotes[selectedIndex]));
+        this.mListFragment.notifyDeleteNote(selectedIndex);
     }
 
     private void onEditClick(View v) {
         int selectedIndex = v.getId() - BUTTON_EDIT_BASE_ID;
         Log.v(TAG, "Selected Index (edit): " + selectedIndex);
         this.mListFragment.notifyEditNote(
-                Long.parseLong(this.idNotes[selectedIndex]),
-                this.textNotes[selectedIndex],
-                this.audioNotes[selectedIndex]);
+                Long.parseLong(this.notesList.get(selectedIndex).get_id()),
+                this.notesList.get(selectedIndex).get_txt(),
+                this.notesList.get(selectedIndex).get_audio());
     }
 }
