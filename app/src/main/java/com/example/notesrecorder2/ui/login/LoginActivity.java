@@ -50,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
         final EditText usernameEditText = binding.username;
         final EditText passwordEditText = binding.password;
         final Button loginButton = binding.login;
+        final Button registerButton = binding.register;
         final ProgressBar loadingProgressBar = binding.loading;
 
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
@@ -59,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
                 loginButton.setEnabled(loginFormState.isDataValid());
+                registerButton.setEnabled(loginFormState.isDataValid());
                 if (loginFormState.getUsernameError() != null) {
                     usernameEditText.setError(getString(loginFormState.getUsernameError()));
                 }
@@ -77,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 loadingProgressBar.setVisibility(View.GONE);
                 if (loginResult.getError() != null) {
-                    Log.v(TAG, "loginResult failed");
+                    Log.v(TAG, "loginResult failed " + loginResult.getError().toString());
                     showLoginFailed(loginResult.getError());
                     return;
                 }
@@ -128,6 +130,15 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
                 loginViewModel.login(usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString());
+            }
+        });
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingProgressBar.setVisibility(View.VISIBLE);
+                loginViewModel.register(usernameEditText.getText().toString(),
                         passwordEditText.getText().toString());
             }
         });

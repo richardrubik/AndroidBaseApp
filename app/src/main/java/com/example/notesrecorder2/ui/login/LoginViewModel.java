@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import android.util.Log;
 import android.util.Patterns;
 
 import com.example.notesrecorder2.data.LoginRepository;
@@ -55,8 +56,10 @@ public class LoginViewModel extends ViewModel {
                         if (task.isSuccessful()) {
                             LoggedInUser data = new LoggedInUser(username, username);
                             loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
+                            Log.v("LoginResult", "success" + task.getResult().toString());
                         } else {
                             loginResult.setValue(new LoginResult(R.string.login_failed));
+                            Log.v("LoginResult", "failure" + task.getResult().toString());
                         }
                     }
                 });
@@ -70,6 +73,23 @@ public class LoginViewModel extends ViewModel {
         } else {
             loginFormState.setValue(new LoginFormState(true));
         }
+    }
+
+    public void register(String username, String password) {
+        mAuth.createUserWithEmailAndPassword(username, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            LoggedInUser data = new LoggedInUser(username, username);
+                            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
+                            Log.v("RegisterResult", "success" + task.getResult().toString());
+                        } else {
+                            loginResult.setValue(new LoginResult(R.string.registration_failed));
+                            Log.v("RegisterResult", "failure" + task.getResult().toString());
+                        }
+                    }
+                });
     }
 
     // A placeholder username validation check

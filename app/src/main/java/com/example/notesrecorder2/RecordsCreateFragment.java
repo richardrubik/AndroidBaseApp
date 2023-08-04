@@ -1,9 +1,11 @@
 package com.example.notesrecorder2;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -23,6 +25,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.notesrecorder2.ui.login.LoginActivity;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +50,7 @@ public class RecordsCreateFragment extends Fragment {
     private String mParam2;
 
     private static final int REQUEST_PERMISSION = 200;
+    private Button buttonLogOut;
     private EditText editTextInput;
     private Button buttonSaveNote;
     private Button buttonAudioNote;
@@ -57,6 +63,7 @@ public class RecordsCreateFragment extends Fragment {
     private DatabaseManager dbManager;
 
     private ViewPagerAdapter mViewPagerAdapter;
+    private FirebaseAuth mAuth;
 
     public RecordsCreateFragment() {
         // Required empty public constructor
@@ -89,6 +96,8 @@ public class RecordsCreateFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        mAuth = FirebaseAuth.getInstance();
     }
 
     @Override
@@ -113,8 +122,24 @@ public class RecordsCreateFragment extends Fragment {
 
         editTextInput = getView().findViewById(R.id.text_input);
         buttonSaveNote = getView().findViewById(R.id.button_save_note);
+        buttonLogOut = getView().findViewById(R.id.button_log_out);
 
         final Context context = getContext();
+
+        buttonLogOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAuth.signOut();
+
+                // go back to Login Activity
+                Intent intent = new Intent(context, LoginActivity.class);
+                startActivity(intent);
+
+                // close MainActivity
+                getActivity().finish();
+            }
+        });
+
         buttonSaveNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
