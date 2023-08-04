@@ -44,6 +44,7 @@
             android:background="@color/white"
             android:textColor="@color/black"
             android:textSize="25sp"
+            android:hint="@string/prompt_text_note"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
