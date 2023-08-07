@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Notes Recorder2</string>
+    <string name="app_name">Notes Recorder</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="records_create_fragment">Create Note</string>
     <string name="records_list_fragment">Notes List</string>

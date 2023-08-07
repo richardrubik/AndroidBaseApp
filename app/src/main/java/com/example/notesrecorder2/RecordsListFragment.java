@@ -17,7 +17,20 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.notesrecorder2.data.model.LoggedInUser;
+import com.google.android.gms.tasks.OnCanceledListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 
 /**
@@ -38,11 +51,8 @@ public class RecordsListFragment extends Fragment {
     private String mParam2;
 
     private ViewPagerAdapter mViewPagerAdapter;
-
-    //final String[] from = new String[] { DatabaseHelper._ID,
-    //        DatabaseHelper.TEXT_NOTE, DatabaseHelper.AUDIO_NOTE };
-
-    //final int[] to = new int[] { R.id._id, R.id.textnote, R.id.audionote };
+    // TODO: cloud stuff
+    FirebaseFirestore cloudDb;
 
     public RecordsListFragment() {
         // Required empty public constructor
@@ -191,6 +201,42 @@ public class RecordsListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // TODO: Sync datd from cloud
+        FirebaseUser fireUser = FirebaseAuth.getInstance().getCurrentUser();
+        Map<String, Object> user = new HashMap<>();
+        user.put("uid", fireUser.getUid());
+        user.put("email", fireUser.getEmail());
+        cloudDb  = FirebaseFirestore.getInstance();
+        Log.d(TAG, "Adding user to DB" + fireUser.getUid());
+        cloudDb.collection("users")
+                .add(user)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error adding document", e);
+                    }
+                })
+                .addOnCanceledListener(new OnCanceledListener() {
+                    @Override
+                    public void onCanceled() {
+                        Log.w(TAG, "Cancelled");
+                    }
+                })
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        Log.w(TAG, "Complete");
+                    }
+                });
+
+
         refreshData();
 
         // TODO: Maybe the next portion is not required anymore? We have edit/delete buttons now.
