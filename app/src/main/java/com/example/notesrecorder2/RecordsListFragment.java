@@ -52,7 +52,6 @@ public class RecordsListFragment extends Fragment {
 
     private ViewPagerAdapter mViewPagerAdapter;
     // TODO: cloud stuff
-    FirebaseFirestore cloudDb;
 
     public RecordsListFragment() {
         // Required empty public constructor
@@ -201,41 +200,6 @@ public class RecordsListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        // TODO: Sync datd from cloud
-        FirebaseUser fireUser = FirebaseAuth.getInstance().getCurrentUser();
-        Map<String, Object> user = new HashMap<>();
-        user.put("uid", fireUser.getUid());
-        user.put("email", fireUser.getEmail());
-        cloudDb  = FirebaseFirestore.getInstance();
-        Log.d(TAG, "Adding user to DB" + fireUser.getUid());
-        cloudDb.collection("users")
-                .add(user)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                })
-                .addOnCanceledListener(new OnCanceledListener() {
-                    @Override
-                    public void onCanceled() {
-                        Log.w(TAG, "Cancelled");
-                    }
-                })
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        Log.w(TAG, "Complete");
-                    }
-                });
-
 
         refreshData();
 

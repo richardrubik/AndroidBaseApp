@@ -1,5 +1,6 @@
 package com.example.notesrecorder2;
 
+import android.util.Log;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +8,7 @@ import android.database.SQLException;
 import org.sqlite.database.sqlite.SQLiteDatabase;
 
 public class DatabaseManager {
+    private static final String TAG = "DataBaseManager";
 
     static {
         System.loadLibrary("sqliteX");
@@ -15,9 +17,12 @@ public class DatabaseManager {
     private DatabaseHelper dbHelper;
     private final Context context;
     private SQLiteDatabase database;
+    private CloudDataBaseManager cloudDb;
 
     public DatabaseManager(Context c) {
+
         context = c;
+        cloudDb = new CloudDataBaseManager();
     }
 
     public void open() throws SQLException {
@@ -40,7 +45,14 @@ public class DatabaseManager {
         ContentValues contentValue = new ContentValues();
         contentValue.put(DatabaseHelper.TEXT_NOTE, text_note);
         contentValue.put(DatabaseHelper.AUDIO_NOTE, audio_note);
-        database.insert(DatabaseHelper.TABLE_NAME, null, contentValue);
+        long id = database.insert(DatabaseHelper.TABLE_NAME, null, contentValue);
+
+        if (id < 0) {
+            Log.w(TAG, "insert failed");
+        } else {
+            // Also add entry to cloud db
+            cloudDb.insert(id, text_note, audio_note);
+        }
     }
 
     public Cursor fetch() {
@@ -56,6 +68,7 @@ public class DatabaseManager {
     }
 
     public void delete(long _id) {
+        cloudDb.delete(_id);
         database.delete(DatabaseHelper.TABLE_NAME, DatabaseHelper._ID + "=" + _id, null);
     }
 }
