@@ -1,5 +1,6 @@
 package com.example.notesrecorder2;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -23,14 +24,40 @@ import java.util.Map;
 public class CloudDataBaseManager {
     private static final String TAG = "CloudDataBaseManager";
     private static final String CollectionName = "users";
-    private FirebaseFirestore cloudDb;
-    private String Uid;
+    private final FirebaseFirestore cloudDb;
+    private final String Uid;
+    private final Context context;
 
-    public CloudDataBaseManager() {
+    public CloudDataBaseManager(Context c) {
+        context = c;
         FirebaseUser fireUser = FirebaseAuth.getInstance().getCurrentUser();
         Uid = fireUser.getUid();
         cloudDb  = FirebaseFirestore.getInstance();
         Log.d(TAG, "Init " + fireUser.getUid());
+    }
+
+    public void sync() {
+        cloudDb.collection(CollectionName).document(Uid).collection("notes")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        DatabaseManager db = DatabaseManager.getInstance(context);
+                        db.open();
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                long id = (long) document.get("id");
+                                String text = (String) document.get("text");
+                                String audio = (String) document.get("audio");
+
+                                db.update(id, text, audio);
+                            }
+                        } else {
+                            Log.w(TAG, "Failed to sync from cloud");
+                        }
+                        db.close();
+                    }
+                });
     }
 
     // This method adds an entry in Firebase DB.

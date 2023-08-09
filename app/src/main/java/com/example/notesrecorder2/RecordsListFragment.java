@@ -17,20 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.notesrecorder2.data.model.LoggedInUser;
-import com.google.android.gms.tasks.OnCanceledListener;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 
 /**
@@ -51,7 +38,6 @@ public class RecordsListFragment extends Fragment {
     private String mParam2;
 
     private ViewPagerAdapter mViewPagerAdapter;
-    // TODO: cloud stuff
 
     public RecordsListFragment() {
         // Required empty public constructor
@@ -92,6 +78,14 @@ public class RecordsListFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_records_list, container, false);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume");
+
+        refreshData();
+    }
+
     private void toggleViewVisibility(boolean hasRows) {
         ListView listView = (ListView) getView().findViewById(R.id.list_view);
         TextView textView = (TextView) getView().findViewById(R.id.empty);
@@ -107,38 +101,35 @@ public class RecordsListFragment extends Fragment {
     private boolean hasInitializedAdapter = false;
 
     public void refreshData() {
-        DatabaseManager dbMgr = new DatabaseManager(this.mViewPagerAdapter.getFragmentActivity());
+
+        if (getView() == null) return;
+
+        //DatabaseManager dbMgr = new DatabaseManager(this.mViewPagerAdapter.getFragmentActivity());
+        DatabaseManager dbMgr = DatabaseManager.getInstance(this.mViewPagerAdapter.getFragmentActivity());
         dbMgr.open();
 
         Cursor cursor = dbMgr.fetch();
         int numRows = cursor.getCount();
 
-        if (numRows > 0) {
-            LinkedList<RecordsListElement> llist = new LinkedList<RecordsListElement>();
+        LinkedList<RecordsListElement> llist = new LinkedList<RecordsListElement>();
 
-            while (cursor.moveToNext()) {
-                llist.add(new RecordsListElement(cursor.getString(0),
-                        cursor.getString(1),
-                        cursor.getString(2)));
-            }
-
-            if (getView() == null) {
-                // The view still hasn't appeared. Let's not update it first.
-                return;
-            }
-
-            ListView listView = (ListView) getView().findViewById(R.id.list_view);
-
-            if (hasInitializedAdapter == false) {
-                ListViewAdapter adapter = new ListViewAdapter(this, this.getContext());
-                listView.setAdapter(adapter);
-                hasInitializedAdapter = true;
-            }
-
-            ListViewAdapter adapter = (ListViewAdapter)listView.getAdapter();
-            adapter.notesList = llist;
-            adapter.notifyDataSetChanged();
+        while (cursor.moveToNext()) {
+            llist.add(new RecordsListElement(cursor.getString(0),
+                    cursor.getString(1),
+                    cursor.getString(2)));
         }
+
+        ListView listView = (ListView) getView().findViewById(R.id.list_view);
+
+        if (hasInitializedAdapter == false) {
+            ListViewAdapter adapter = new ListViewAdapter(this, this.getContext());
+            listView.setAdapter(adapter);
+            hasInitializedAdapter = true;
+        }
+
+        ListViewAdapter adapter = (ListViewAdapter)listView.getAdapter();
+        adapter.notesList = llist;
+        adapter.notifyDataSetChanged();
 
         toggleViewVisibility(numRows > 0);
         dbMgr.close();

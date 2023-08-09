@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.notesrecorder2.ui.login.LoginActivity;
@@ -39,6 +40,8 @@ import java.io.IOException;
  * create an instance of this fragment.
  */
 public class RecordsCreateFragment extends Fragment {
+
+    private static final String TAG = "RecordsCreateFragment";
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -117,8 +120,10 @@ public class RecordsCreateFragment extends Fragment {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 REQUEST_PERMISSION);
 
-        dbManager = new DatabaseManager(this.mViewPagerAdapter.getFragmentActivity());
+        //dbManager = new DatabaseManager(this.mViewPagerAdapter.getFragmentActivity());
+        dbManager = DatabaseManager.getInstance(this.mViewPagerAdapter.getFragmentActivity());
         dbManager.open();
+        dbManager.sync();
 
         editTextInput = getView().findViewById(R.id.text_input);
         buttonSaveNote = getView().findViewById(R.id.button_save_note);
@@ -148,7 +153,9 @@ public class RecordsCreateFragment extends Fragment {
                 Log.i("SaveNote", "note: "+ note);
 
                 // Save text and audio path to database
-                dbManager.insert(note, savedUri.toString());
+                dbManager.open();
+                long id = dbManager.insert(note, savedUri.toString());
+                dbManager.close();
                 Toast.makeText(context, "Note Saved", Toast.LENGTH_LONG).show();
 
                 // So that we don't double save (hence double delete)
@@ -193,10 +200,9 @@ public class RecordsCreateFragment extends Fragment {
     }
 
     private boolean checkPermissions() {
-        if (ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this.getActivity(), new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION);
+        if (ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this.getActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_PERMISSION);
+            Log.w(TAG, "bad permissions");
             return false;
         }
 
