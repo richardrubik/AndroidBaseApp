@@ -60,19 +60,6 @@ public class DatabaseManager {
 
     public void insert(String text_note, String audio_note) {
         this.cloudDb.insert(text_note, audio_note);
-
-        /*ContentValues contentValue = new ContentValues();
-        contentValue.put(DatabaseHelper.TEXT_NOTE, text_note);
-        contentValue.put(DatabaseHelper.AUDIO_NOTE, audio_note);
-        contentValue.put(DatabaseHelper.DOC_ID, doc_id);
-        long id = this.database.insert(DatabaseHelper.TABLE_NAME, null, contentValue);
-
-        if (id < 0) {
-            Log.w(TAG, "insert failed");
-        } else {
-            // Also add entry to cloud db
-            this.cloudDb.insert(text_note, audio_note);
-        }*/
     }
 
     public Cursor fetch() {

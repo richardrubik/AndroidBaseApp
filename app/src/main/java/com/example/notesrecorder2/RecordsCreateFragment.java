@@ -160,8 +160,6 @@ public class RecordsCreateFragment extends Fragment {
 
                 // So that we don't double save (hence double delete)
                 savedUri = Uri.EMPTY;
-
-                mViewPagerAdapter.refreshListFragment();
             }
         });
 
