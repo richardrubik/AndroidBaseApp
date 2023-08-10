@@ -11,16 +11,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String _ID = "_id";
     public static final String TEXT_NOTE = "text_note";
     public static final String AUDIO_NOTE = "audio_note";
+    public static final String DOC_ID = "doc_id";
 
     // Database info
     static final String DB_NAME = "notes.db";
 
     // Database version
-    static final int DB_VERSION = 1;
+    static final int DB_VERSION = 2;
 
     // Creating table query
     private static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + _ID
-            + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TEXT_NOTE + " TEXT NOT NULL, " + AUDIO_NOTE + " TEXT);";
+            + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TEXT_NOTE + " TEXT NOT NULL, " + AUDIO_NOTE + " TEXT, "
+            + DOC_ID + " TEXT);";
 
     public DatabaseHelper(Context context)
     {

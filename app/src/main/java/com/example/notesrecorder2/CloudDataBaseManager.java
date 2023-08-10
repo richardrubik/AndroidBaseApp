@@ -36,6 +36,7 @@ public class CloudDataBaseManager {
         Log.d(TAG, "Init " + fireUser.getUid());
     }
 
+    // version 1: call this only when SQL db is empty
     public void sync() {
         cloudDb.collection(CollectionName).document(Uid).collection("notes")
                 .get()
@@ -50,7 +51,7 @@ public class CloudDataBaseManager {
                                 String text = (String) document.get("text");
                                 String audio = (String) document.get("audio");
 
-                                db.update(id, text, audio);
+                                db.insertDbOnly(text, audio, document.getId());
                             }
                         } else {
                             Log.w(TAG, "Failed to sync from cloud");
@@ -62,9 +63,9 @@ public class CloudDataBaseManager {
 
     // This method adds an entry in Firebase DB.
     // TODO: If there is a media file, we need to store it in Firebase Cloud Storage
-    public void insert(long id, String text, String audio_path) {
+    public void insert(String text, String audio_path) {
         Map<String, Object> user = new HashMap<>();
-        user.put("id", id);
+        //user.put("id", id);
         user.put("text", text);
         user.put("audio", audio_path);
         user.put("timestamp", FieldValue.serverTimestamp());
@@ -72,8 +73,12 @@ public class CloudDataBaseManager {
         cloudDb.collection(CollectionName).document(Uid).collection("notes").add(user)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                    public void onSuccess(DocumentReference docRef) {
+                        Log.d(TAG, "DocumentSnapshot added with ID: " + docRef.getId());
+                        DatabaseManager db = DatabaseManager.getInstance(context);
+                        db.open();
+                        db.insertDbOnly(text, audio_path, docRef.getId());
+                        db.close();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -84,25 +89,20 @@ public class CloudDataBaseManager {
                 });
     }
 
-    public void delete(long id) {
+    public void delete(String id) {
         cloudDb.collection(CollectionName).document(Uid).collection("notes")
-                .whereEqualTo("id", id)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .document(id)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                cloudDb.collection(CollectionName)
-                                        .document(Uid)
-                                        .collection("notes")
-                                        .document(document.getId()).delete();
-
-                                Log.d(TAG, document.getId() + " deleted");
-                            }
-                        } else {
-                            Log.d(TAG, "delete: Error getting documents: ", task.getException());
-                        }
+                    public void onSuccess(Void unused) {
+                        Log.i(TAG, "Cloud delete success");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Cloud delete failed: " + e);
                     }
                 });
     }

@@ -49,20 +49,30 @@ public class DatabaseManager {
         dbHelper.close();
     }
 
-    public long insert(String text_note, String audio_note) {
+    public long insertDbOnly(String text_note, String audio_note, String doc_id) {
         ContentValues contentValue = new ContentValues();
         contentValue.put(DatabaseHelper.TEXT_NOTE, text_note);
         contentValue.put(DatabaseHelper.AUDIO_NOTE, audio_note);
+        contentValue.put(DatabaseHelper.DOC_ID, doc_id);
+        long id = this.database.insert(DatabaseHelper.TABLE_NAME, null, contentValue);
+        return id;
+    }
+
+    public void insert(String text_note, String audio_note) {
+        this.cloudDb.insert(text_note, audio_note);
+
+        /*ContentValues contentValue = new ContentValues();
+        contentValue.put(DatabaseHelper.TEXT_NOTE, text_note);
+        contentValue.put(DatabaseHelper.AUDIO_NOTE, audio_note);
+        contentValue.put(DatabaseHelper.DOC_ID, doc_id);
         long id = this.database.insert(DatabaseHelper.TABLE_NAME, null, contentValue);
 
         if (id < 0) {
             Log.w(TAG, "insert failed");
         } else {
             // Also add entry to cloud db
-            this.cloudDb.insert(id, text_note, audio_note);
-        }
-
-        return id;
+            this.cloudDb.insert(text_note, audio_note);
+        }*/
     }
 
     public Cursor fetch() {
@@ -78,7 +88,11 @@ public class DatabaseManager {
     }
 
     public void delete(long _id) {
-        this.cloudDb.delete(_id);
+        String columns[] = new String[] { DatabaseHelper._ID, DatabaseHelper.DOC_ID };
+        Cursor cursor = this.database.query(DatabaseHelper.TABLE_NAME, columns, DatabaseHelper._ID + " = " + _id, null, null, null, null);
+        cursor.moveToFirst();
+        //Log.d(TAG, "UID " + cursor.getString(1));
+        this.cloudDb.delete(cursor.getString(1));
         this.database.delete(DatabaseHelper.TABLE_NAME, DatabaseHelper._ID + "=" + _id, null);
     }
 
