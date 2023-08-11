@@ -47,7 +47,6 @@ public class CloudDataBaseManager {
                         db.open();
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                long id = (long) document.get("id");
                                 String text = (String) document.get("text");
                                 String audio = (String) document.get("audio");
 

@@ -9,6 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.LinkedList;
 
 public class ListViewAdapter extends BaseAdapter {
@@ -58,7 +59,11 @@ public class ListViewAdapter extends BaseAdapter {
         if (e.get_audio().isEmpty()) {
             audio_note.setText("(no audio note)");
         } else {
-            audio_note.setText(e.get_audio());
+            // Extract filename and display only that
+            File f = new File(e.get_audio());
+            if (f.exists()) {
+                audio_note.setText(f.getName());
+            }
         }
 
         Button btnDelete = (Button) view.findViewById(R.id.buttonDelete);

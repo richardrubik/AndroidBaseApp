@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.LinkedList;
 
 
@@ -147,9 +148,11 @@ public class RecordsListFragment extends Fragment {
         dbMgr.delete(Integer.parseInt(e.get_id()));
         // delete audio item
         if (e.get_audio() != null && e.get_audio().isEmpty() == false) {
-            Log.v("doDeleteNote", e.get_audio());
-            ContentResolver cr = requireContext().getContentResolver();
-            cr.delete(Uri.parse(e.get_audio()), null, null);
+            File f = new File(e.get_audio());
+            if (f.exists()) {
+                Log.v("doDeleteNote", f.getName());
+                f.delete();
+            }
         }
         // delete item in linked list
         a.notesList.remove(id);

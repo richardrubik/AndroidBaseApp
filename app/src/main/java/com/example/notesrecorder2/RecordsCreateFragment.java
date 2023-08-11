@@ -154,7 +154,7 @@ public class RecordsCreateFragment extends Fragment {
 
                 // Save text and audio path to database
                 dbManager.open();
-                dbManager.insert(note, savedUri.toString());
+                dbManager.insert(note, audioFile.getAbsolutePath());
                 dbManager.close();
                 Toast.makeText(context, "Note Saved", Toast.LENGTH_LONG).show();
 
@@ -170,10 +170,12 @@ public class RecordsCreateFragment extends Fragment {
                 if (isRecording) {
                     stopRecording();
                     buttonAudioNote.setText("Start Recording");
+                    buttonSaveNote.setEnabled(true);
                 } else {
                     if (checkPermissions()) {
                         if (startRecording() == true) {
                             buttonAudioNote.setText("Stop Recording");
+                            buttonSaveNote.setEnabled(false);
                         }
                     }
                 }
@@ -208,11 +210,12 @@ public class RecordsCreateFragment extends Fragment {
     }
 
     private boolean startRecording() {
-        File audioFileDir = requireContext().getExternalCacheDir();
+        File audioFileDir = new File(requireContext().getFilesDir(), "audio");
+        audioFileDir.mkdir();
         try {
-            audioFile = File.createTempFile("record", ".3gp", audioFileDir);
+            audioFile = File.createTempFile("audio", ".3gp", audioFileDir);
         } catch (IOException e) {
-            Log.e("NotesRecorder", "external storage access error");
+            Log.e("NotesRecorder", "storage access error");
             return false;
         }
         mediaRecorder = new MediaRecorder();
@@ -243,28 +246,17 @@ public class RecordsCreateFragment extends Fragment {
     }
 
     private void addRecordingToMediaLibrary() {
-        //creating content values of size 4
-        ContentValues values = new ContentValues(4);
-        long current = System.currentTimeMillis();
-        values.put(MediaStore.Audio.Media.TITLE, "audio" + audioFile.getName());
-        values.put(MediaStore.Audio.Media.DATE_ADDED, (int) (current / 1000));
-        values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/3gpp");
-        values.put(MediaStore.Audio.Media.DATA, audioFile.getAbsolutePath());
-
-        //creating content resolver and storing it in the external content uri
-        ContentResolver contentResolver = requireContext().getContentResolver();
-        Uri base = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Uri newUri = contentResolver.insert(base, values);
-
-        //sending broadcast message to scan the media file so that it can be available
-        //requireContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, newUri));
-        Toast.makeText(this.getContext(), "Saved File " + newUri, Toast.LENGTH_LONG).show();
+        //MediaScannerConnection.scanFile(getContext(), new String[]{newUri.getPath()}, null, null);
+        Toast.makeText(this.getContext(), "Saved File " + audioFile.getName(), Toast.LENGTH_LONG).show();
 
         // remove an existing recording
         if (savedUri != Uri.EMPTY) {
             Log.i("SaveMedia", "Overwriting media " + savedUri.getPath());
-            contentResolver.delete(savedUri, null, null);
+            File f = new File(savedUri.getPath());
+            if (f.exists()) {
+                f.delete();
+            }
         }
-        savedUri = newUri;
+        savedUri = Uri.fromFile(audioFile);
     }
 }
