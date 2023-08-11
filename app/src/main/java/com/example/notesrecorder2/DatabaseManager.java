@@ -75,11 +75,15 @@ public class DatabaseManager {
     }
 
     public void delete(long _id) {
-        String columns[] = new String[] { DatabaseHelper._ID, DatabaseHelper.DOC_ID };
+        String columns[] = new String[] { DatabaseHelper._ID, DatabaseHelper.AUDIO_NOTE, DatabaseHelper.DOC_ID };
         Cursor cursor = this.database.query(DatabaseHelper.TABLE_NAME, columns, DatabaseHelper._ID + " = " + _id, null, null, null, null);
         cursor.moveToFirst();
         //Log.d(TAG, "UID " + cursor.getString(1));
-        this.cloudDb.delete(cursor.getString(1));
+        // remove audio file from cloud store
+        this.cloudDb.deleteFile(cursor.getString(1));
+        // remove entry from cloud db
+        this.cloudDb.delete(cursor.getString(2));
+        // remove entry from local db
         this.database.delete(DatabaseHelper.TABLE_NAME, DatabaseHelper._ID + "=" + _id, null);
     }
 
