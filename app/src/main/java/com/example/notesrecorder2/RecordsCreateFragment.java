@@ -154,7 +154,7 @@ public class RecordsCreateFragment extends Fragment {
 
                 // Save text and audio path to database
                 dbManager.open();
-                dbManager.insert(note, audioFile.getAbsolutePath());
+                dbManager.insert(note, savedUri.getPath());
                 dbManager.close();
                 Toast.makeText(context, "Note Saved", Toast.LENGTH_LONG).show();
 

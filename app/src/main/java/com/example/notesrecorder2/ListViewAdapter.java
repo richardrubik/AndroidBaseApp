@@ -53,29 +53,10 @@ public class ListViewAdapter extends BaseAdapter {
         view = inflater.inflate(R.layout.record_list_item, null);
         TextView id_note = (TextView) view.findViewById(R.id._id);
         TextView text_note = (TextView) view.findViewById(R.id.textnote);
-        TextView audio_note = (TextView) view.findViewById(R.id.audionote);
 
         RecordsListElement e = notesList.get(i);
         id_note.setText(e.get_id());
         text_note.setText(e.get_txt());
-        if (e.get_audio().isEmpty()) {
-            audio_note.setText("(no audio note)");
-        } else {
-            // Extract filename and display only that
-            File f = new File(e.get_audio());
-            if (f.exists()) {
-                audio_note.setText(f.getName());
-                audio_note.setClickable(true);
-            }
-        }
-
-        audio_note.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "audio clicked " + i);
-                playAudio(i);
-            }
-        });
 
         Button btnDelete = (Button) view.findViewById(R.id.buttonDelete);
         btnDelete.setId(BUTTON_DELETE_BASE_ID + i);
@@ -93,6 +74,19 @@ public class ListViewAdapter extends BaseAdapter {
                 onEditClick(v);
             }
         });
+
+        Button btnPlay = (Button) view.findViewById(R.id.buttonPlay);
+        btnPlay.setId(i);
+        btnPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playAudio(v.getId());
+            }
+        });
+
+        if (e.get_audio() == null || e.get_audio().isEmpty()) {
+            btnPlay.setEnabled(false);
+        }
 
         return view;
     }
