@@ -1,6 +1,8 @@
 package com.example.notesrecorder2;
 
 import android.content.Context;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,8 +65,17 @@ public class ListViewAdapter extends BaseAdapter {
             File f = new File(e.get_audio());
             if (f.exists()) {
                 audio_note.setText(f.getName());
+                audio_note.setClickable(true);
             }
         }
+
+        audio_note.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "audio clicked " + i);
+                playAudio(i);
+            }
+        });
 
         Button btnDelete = (Button) view.findViewById(R.id.buttonDelete);
         btnDelete.setId(BUTTON_DELETE_BASE_ID + i);
@@ -99,5 +110,23 @@ public class ListViewAdapter extends BaseAdapter {
                 Long.parseLong(this.notesList.get(selectedIndex).get_id()),
                 this.notesList.get(selectedIndex).get_txt(),
                 this.notesList.get(selectedIndex).get_audio());
+    }
+
+    private void playAudio(int index) {
+        Uri uri = Uri.fromFile(new File(this.notesList.get(index).get_audio()));
+        MediaPlayer mp = MediaPlayer.create(this.mListFragment.getContext(), uri);
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.stop();
+                mp.release();
+            }
+        });
+
+        if (mp.isPlaying() == false) {
+            mp.start();
+        } else {
+            mp.stop();
+        }
     }
 }
