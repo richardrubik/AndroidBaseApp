@@ -45,7 +45,7 @@ public class CloudDataBaseManager {
         Log.d(TAG, "Init " + fireUser.getUid());
 
         cloudStore = FirebaseStorage.getInstance();
-        audioRef = cloudStore.getReference().child(Uid + "/audio");
+        audioRef = cloudStore.getReference().child("users/" + Uid + "/audio");
     }
 
     // version 1: call this only when SQL db is empty
