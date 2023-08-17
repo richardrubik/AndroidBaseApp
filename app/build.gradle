@@ -19,9 +19,16 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            shrinkResources true
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
+        }
+        debug {
+            debuggable true
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
@@ -45,6 +52,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx:22.1.1'
     implementation 'com.google.firebase:firebase-storage:20.2.1'
     implementation 'com.google.firebase:firebase-firestore:24.7.0'
+    implementation 'com.google.android.gms:play-services-ads:22.2.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

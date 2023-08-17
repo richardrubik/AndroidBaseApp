@@ -56,21 +56,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="@string/audio_note"
-            app:layout_constraintBottom_toTopOf="@id/tvNotes"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_input" />
-
-        <TextView
-            android:id="@+id/tvNotes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
             app:layout_constraintBottom_toTopOf="@id/button_save_note"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/button_audio_note" />
+            app:layout_constraintTop_toBottomOf="@id/text_input" />
 
         <Button
             android:id="@+id/button_save_note"
@@ -81,7 +70,20 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvNotes" />
+            app:layout_constraintTop_toBottomOf="@id/button_audio_note" />
+
+        <com.google.android.gms.ads.AdView
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            app:layout_constraintTop_toBottomOf="@id/button_save_note"
+            ads:adSize="BANNER"
+            ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+        </com.google.android.gms.ads.AdView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

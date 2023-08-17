@@ -28,6 +28,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.notesrecorder2.ui.login.LoginActivity;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.File;
@@ -67,6 +69,7 @@ public class RecordsCreateFragment extends Fragment {
 
     private ViewPagerAdapter mViewPagerAdapter;
     private FirebaseAuth mAuth;
+    private AdView mAdView;
 
     public RecordsCreateFragment() {
         // Required empty public constructor
@@ -181,6 +184,10 @@ public class RecordsCreateFragment extends Fragment {
                 }
             }
         });
+
+        mAdView = getView().findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     @Override
