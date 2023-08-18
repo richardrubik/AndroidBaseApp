@@ -30,20 +30,24 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:textColor="@color/blue_300"
+            android:maxLines="1"
             android:visibility="invisible" />
-
-        <TextView
-            android:id="@+id/audionote"
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@color/blue_300" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_alignParentEnd="true">
+
+            <Button
+                android:id="@+id/buttonPlay"
+                style="@android:style/Widget.Button"
+                android:padding="8dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@android:drawable/ic_media_play"
+                app:icon="@android:drawable/ic_media_play"
+                android:onClick="onPlayClick" />
 
             <Button
                 android:id="@+id/buttonEdit"

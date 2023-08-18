@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.LinkedList;
 
 
@@ -78,6 +79,14 @@ public class RecordsListFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_records_list, container, false);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume");
+
+        refreshData();
+    }
+
     private void toggleViewVisibility(boolean hasRows) {
         ListView listView = (ListView) getView().findViewById(R.id.list_view);
         TextView textView = (TextView) getView().findViewById(R.id.empty);
@@ -93,38 +102,35 @@ public class RecordsListFragment extends Fragment {
     private boolean hasInitializedAdapter = false;
 
     public void refreshData() {
-        DatabaseManager dbMgr = new DatabaseManager(this.mViewPagerAdapter.getFragmentActivity());
+
+        if (getView() == null) return;
+
+        //DatabaseManager dbMgr = new DatabaseManager(this.mViewPagerAdapter.getFragmentActivity());
+        DatabaseManager dbMgr = DatabaseManager.getInstance(this.mViewPagerAdapter.getFragmentActivity());
         dbMgr.open();
 
         Cursor cursor = dbMgr.fetch();
         int numRows = cursor.getCount();
 
-        if (numRows > 0) {
-            LinkedList<RecordsListElement> llist = new LinkedList<RecordsListElement>();
+        LinkedList<RecordsListElement> llist = new LinkedList<RecordsListElement>();
 
-            while (cursor.moveToNext()) {
-                llist.add(new RecordsListElement(cursor.getString(0),
-                        cursor.getString(1),
-                        cursor.getString(2)));
-            }
-
-            if (getView() == null) {
-                // The view still hasn't appeared. Let's not update it first.
-                return;
-            }
-
-            ListView listView = (ListView) getView().findViewById(R.id.list_view);
-
-            if (!hasInitializedAdapter) {
-                ListViewAdapter adapter = new ListViewAdapter(this, this.getContext());
-                listView.setAdapter(adapter);
-                hasInitializedAdapter = true;
-            }
-
-            ListViewAdapter adapter = (ListViewAdapter)listView.getAdapter();
-            adapter.notesList = llist;
-            adapter.notifyDataSetChanged();
+        while (cursor.moveToNext()) {
+            llist.add(new RecordsListElement(cursor.getString(0),
+                    cursor.getString(1),
+                    cursor.getString(2)));
         }
+      
+        ListView listView = (ListView) getView().findViewById(R.id.list_view);
+
+        if (!hasInitializedAdapter) {
+            ListViewAdapter adapter = new ListViewAdapter(this, this.getContext());
+            listView.setAdapter(adapter);
+            hasInitializedAdapter = true;
+        }
+
+        ListViewAdapter adapter = (ListViewAdapter)listView.getAdapter();
+        adapter.notesList = llist;
+        adapter.notifyDataSetChanged();
 
         toggleViewVisibility(numRows > 0);
         dbMgr.close();
@@ -142,9 +148,11 @@ public class RecordsListFragment extends Fragment {
         dbMgr.delete(Integer.parseInt(e.get_id()));
         // delete audio item
         if (e.get_audio() != null && !e.get_audio().isEmpty()) {
-            Log.v("doDeleteNote", e.get_audio());
-            ContentResolver cr = requireContext().getContentResolver();
-            cr.delete(Uri.parse(e.get_audio()), null, null);
+            File f = new File(e.get_audio());
+            if (f.exists()) {
+                Log.v("doDeleteNote", f.getName());
+                f.delete();
+            }
         }
         // delete item in linked list
         a.notesList.remove(id);
@@ -186,6 +194,7 @@ public class RecordsListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         refreshData();
 
         // TODO: Maybe the next portion is not required anymore? We have edit/delete buttons now.
