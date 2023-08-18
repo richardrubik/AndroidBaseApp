@@ -255,7 +255,7 @@ public class RecordsCreateFragment extends Fragment {
     private void addRecordingToMediaLibrary() {
         //MediaScannerConnection.scanFile(getContext(), new String[]{newUri.getPath()}, null, null);
         Toast.makeText(this.getContext(), "Saved File " + audioFile.getName(), Toast.LENGTH_LONG).show();
-
+        // TODO: Perform 3gp to mp3 conversion here.
         // remove an existing recording
         if (savedUri != Uri.EMPTY) {
             Log.i("SaveMedia", "Overwriting media " + savedUri.getPath());
