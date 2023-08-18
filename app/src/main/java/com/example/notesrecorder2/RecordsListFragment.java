@@ -119,6 +119,11 @@ public class RecordsListFragment extends Fragment {
                     cursor.getString(1),
                     cursor.getString(2)));
         }
+
+        if (getView() == null) {
+            // The view still hasn't appeared. Let's not update it first.
+            return;
+        }
       
         ListView listView = (ListView) getView().findViewById(R.id.list_view);
 
