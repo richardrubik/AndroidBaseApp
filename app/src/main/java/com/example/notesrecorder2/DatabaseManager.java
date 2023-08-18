@@ -23,13 +23,6 @@ public class DatabaseManager {
     public void open() throws SQLException {
         dbHelper = new DatabaseHelper(context);
         database = dbHelper.getWritableDatabase();
-        /*
-        String QUERY_VERSION = "SELECT sqlite_version();";
-
-        Cursor c = database.rawQuery(QUERY_VERSION, new String[] {});
-        if (c.moveToFirst()) {
-            Log.v("DATABASE", c.getString(0));
-        }*/
     }
 
     public void close() {

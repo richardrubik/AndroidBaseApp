@@ -39,11 +39,6 @@ public class RecordsListFragment extends Fragment {
 
     private ViewPagerAdapter mViewPagerAdapter;
 
-    //final String[] from = new String[] { DatabaseHelper._ID,
-    //        DatabaseHelper.TEXT_NOTE, DatabaseHelper.AUDIO_NOTE };
-
-    //final int[] to = new int[] { R.id._id, R.id.textnote, R.id.audionote };
-
     public RecordsListFragment() {
         // Required empty public constructor
     }
@@ -120,7 +115,7 @@ public class RecordsListFragment extends Fragment {
 
             ListView listView = (ListView) getView().findViewById(R.id.list_view);
 
-            if (hasInitializedAdapter == false) {
+            if (!hasInitializedAdapter) {
                 ListViewAdapter adapter = new ListViewAdapter(this, this.getContext());
                 listView.setAdapter(adapter);
                 hasInitializedAdapter = true;
@@ -146,7 +141,7 @@ public class RecordsListFragment extends Fragment {
         // delete item in database
         dbMgr.delete(Integer.parseInt(e.get_id()));
         // delete audio item
-        if (e.get_audio() != null && e.get_audio().isEmpty() == false) {
+        if (e.get_audio() != null && !e.get_audio().isEmpty()) {
             Log.v("doDeleteNote", e.get_audio());
             ContentResolver cr = requireContext().getContentResolver();
             cr.delete(Uri.parse(e.get_audio()), null, null);

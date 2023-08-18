@@ -1,8 +1,5 @@
 package com.example.notesrecorder2;
 
-import android.content.Context;
-import android.util.Log;
-
 import java.io.File;
 
 public class Transcoder {
