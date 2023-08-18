@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Notes Recorder2</string>
+    <string name="app_name">Notes Recorder</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="records_create_fragment">Create Note</string>
     <string name="records_list_fragment">Notes List</string>
@@ -10,4 +10,16 @@
     <string name="save_note">Save Note</string>
     <string name="delete_note">Delete Note</string>
     <string name="edit_note">Edit Note</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_text_note">Type a note</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="action_register">Register</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="registration_failed">"Registration failed"</string>
 </resources>
