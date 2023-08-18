@@ -1,5 +1,8 @@
 package com.example.notesrecorder2;
 
+import android.content.Context;
+import android.util.Log;
+
 import java.io.File;
 
 public class Transcoder {
@@ -7,13 +10,12 @@ public class Transcoder {
         System.loadLibrary("avutil");
         System.loadLibrary("avcodec");
         System.loadLibrary("avformat");
+        System.loadLibrary("swresample");
         //System.loadLibrary("avfilter"); // maybe not needed?
         System.loadLibrary("transcoder");
     }
 
     private Transcoder() {}
-
-    public static native String test();
 
     public static native boolean convert3gpToMp3(File input, File output);
 }
